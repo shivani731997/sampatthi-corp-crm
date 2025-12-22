@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Leads Dashboard</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <nav>
+    <a href="add.html">+ Add New Lead</a>
+    <a href="leads.html">Dashboard Home</a>
+    <button id="themeToggle" class="theme-icon">💵</button>
+  </nav>
+  
+  <h1>Welcome to Your Leads Dashboard</h1>
+  <button id="logout-btn">Logout</button>
+
+  <!-- Filter Section -->
+  <section id="filter-section" style="margin: 20px 0;">
+    <h3>Filter Leads</h3>
+    <form id="filter-form" style="display: flex; gap: 15px; align-items: flex-end;">
+      
+      <div>
+        <label for="filterStatus">Call Track</label><br/>
+        <select id="filterStatus" name="filterStatus">
+          <option value="">All</option>
+          <option value="followup1">Follow up 1</option>
+          <option value="followup2">Follow up 2</option>
+          <option value="followup3">Follow up 3</option>
+        </select>
+      </div>
+
+      <!-- Assigned To filter - hidden for non-admin, shown for admin -->
+      <div id="filterAssignedToContainer" style="display:none;">
+        <label for="filterAssignedTo">Assigned To:</label><br />
+        <select id="filterAssignedTo" name="filterAssignedTo">
+          <option value="">All</option>
+          <!-- Options dynamically populated -->
+        </select>
+      </div>
+
+      <!-- ✅ LEAD QUALITY FILTER (ADMIN + SALES) -->
+      <div>
+        <label for="filterColor">Lead Stage:</label><br/>
+        <select id="filterColor" name="filterColor">
+          <option value="">All</option>
+          <option value="white">⚪ Fresh</option>
+          <option value="yellow">🟡 Persuasion</option>
+          <option value="green">🟢 Proposal Stage</option>
+          <option value="red">🔴 Junk</option>
+          <option value="black">⚫ Closure</option>
+        </select>
+        
+      </div>
+
+      <div>
+        <button type="submit" id="filterBtn">Apply Filter</button>
+        <button type="button" id="clearFilterBtn">Clear Filter</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- No results message -->
+  <div id="noResultsMsg" style="color: #a00; font-weight: bold; margin-bottom: 10px; display: none;"></div>
+
+  <!-- BULK ASSIGN BAR (ADMIN ONLY) -->
+  <div id="bulkAssignBar" style="display:none; margin:15px 0; padding:10px; border:1px solid #ccc;">
+    <strong>Bulk assign selected leads to:</strong>
+    <select id="bulkAssignUser">
+      <option value="">Select sales user</option>
+    </select>
+    <button id="bulkAssignBtn">Apply</button>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrapper"></div>
+    <table id="leadsTable">
+      <thead id="tableHead"></thead>
+      <tbody id="leadsTableBody"></tbody>
+    </table>
+  </div>
+
+  <div id="pagination" style="margin-top: 20px; text-align: center;"></div>
+
+  <script type="module" src="js/leads.js"></script>
+  <script type="module">
+    import { toggleTheme } from "./js/theme.js";
+    document.getElementById("themeToggle")?.addEventListener("click", toggleTheme);
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,669 @@
+/* ------------------------------------------
+   Design System – Variables
+------------------------------------------ */
+:root {
+  --font-family: "Inter", "SF Pro Text", Arial, sans-serif;
+
+  /* Light theme */
+  --bg: #f8f9fa;
+  --bg-card: #ffffff;
+  --text: #1c1c1c;
+  --text-light: #6e6e6e;
+  --border: #e6e6e6;
+
+  /* (Old primary & hover replaced with luxury colors for buttons) */
+  --luxury-gold: #d4af37;
+  --luxury-gold-hover: #f2d675;
+  --luxury-black: #0d0d0d;
+
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="dark"] {
+  --bg: #0f0f0f;
+  --bg-card: #1a1a1a;
+  --text: #f5f5f5;
+  --text-light: #9a9a9a;
+  --border: #2a2a2a;
+
+  --luxury-gold: #e8c766;
+  --luxury-gold-hover: #ffe699;
+  --luxury-black: #000;
+
+  --shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+}
+
+/* Smooth transition */
+* {
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* ------------------------------------------
+   Global Styles
+------------------------------------------ */
+body {
+  font-family: var(--font-family);
+  margin: 0;
+  padding: 20px;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* ------------------------------------------
+   Navigation Bar (Clean, Premium)
+------------------------------------------ */
+nav {
+  background: #c9c9c9;
+  padding: 12px 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+  margin-bottom: 20px;
+}
+
+/* ------------------------------------------
+   NAV BUTTONS (Gold Luxury)
+   Applies to nav links AND nav buttons
+------------------------------------------ */
+nav a,
+nav button {
+  text-decoration: none;
+  font-size: 15px;
+  padding: 9px 16px;
+  border-radius: 10px;
+
+  background: var(--luxury-black);
+  color: var(--luxury-gold);
+  border: 1px solid var(--luxury-gold);
+
+  box-shadow: 0 0 0 rgba(0,0,0,0.0);
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+nav a:hover,
+nav button:hover {
+  background: var(--luxury-gold);
+  color: var(--luxury-black);
+  border-color: var(--luxury-gold-hover);
+}
+
+/* Active (optional) */
+nav .active {
+  background: var(--luxury-gold);
+  color: var(--luxury-black);
+}
+
+/* Mobile responsive navbar */
+@media (max-width: 600px) {
+  nav {
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px;
+  }
+
+  nav a,
+  nav button {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* ------------------------------------------
+   Lead List Cards (Mobile View)
+------------------------------------------ */
+.lead-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+}
+
+/* ------------------------------------------
+   Table Styling
+------------------------------------------ */
+#leadsTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: var(--bg-card);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  font-size: 15px;
+}
+
+#leadsTable th,
+#leadsTable td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+#leadsTable th {
+  background: var(--bg);
+  font-weight: 600;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#leadsTable tr:hover {
+  background: rgba(212, 175, 55, 0.08); /* soft gold tint hover */
+  cursor: pointer;
+}
+
+/* ------------------------------------------
+   Tags (Assigned To)
+------------------------------------------ */
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  background: var(--luxury-gold);
+  color: var(--luxury-black);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+}
+
+.tag .remove-tag {
+  margin-left: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* ------------------------------------------
+   Multi-select Dropdown Suggestions
+------------------------------------------ */
+.suggestions-list {
+  position: absolute;
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  max-height: 150px;
+  overflow-y: auto;
+  box-shadow: var(--shadow);
+  z-index: 20;
+}
+
+.suggestion-item {
+  padding: 10px 14px;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.suggestion-item:hover {
+  background: var(--luxury-gold);
+  color: var(--luxury-black);
+}
+
+/* ------------------------------------------
+   Form Styling
+------------------------------------------ */
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-card);
+  color: var(--text);
+  font-size: 1rem;
+}
+
+/* ------------------------------------------
+   GLOBAL BUTTONS (Apply Filters, Save, Submit, etc.)
+------------------------------------------ */
+button {
+  padding: 12px 20px;
+
+  background: var(--luxury-black);
+  color: var(--luxury-gold);
+  border: 1px solid var(--luxury-gold);
+
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  background: var(--luxury-gold);
+  color: var(--luxury-black);
+}
+
+/* ------------------------------------------
+   Links
+------------------------------------------ */
+/* Only style email and phone links inside the leads table */
+#leadsTable a {
+  color: #0d01f4;
+  text-decoration: none;
+}
+
+#leadsTable a:hover {
+  color: #6BCB77;
+  text-decoration: underline;
+}
+
+[data-theme="dark"] #leadsTable a {
+  color: #1168ff;
+}
+
+[data-theme="dark"] #leadsTable a:hover {
+  color: #43fa00;
+}
+
+/* ------------------------------------------
+   Mobile Responsiveness
+------------------------------------------ */
+@media (max-width: 600px) {
+  body {
+    padding: 12px;
+    font-size: 15px;
+  }
+
+  #leadsTable th,
+  #leadsTable td {
+    padding: 10px 12px;
+  }
+}
+
+/* Login form container */
+#login-form {
+  max-width: 350px;
+  margin: 0 auto 20px auto; /* center horizontally and add bottom margin */
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* space between inputs and button */
+}
+
+/* Override inputs inside login form */
+#login-form input {
+  width: 100%;  /* full width inside form container */
+  padding: 12px 14px;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  box-sizing: border-box;
+}
+
+/* Button spacing and width */
+#login-form button {
+  width: 100%;
+  padding: 12px 20px;
+  font-size: 1rem;
+  border-radius: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  background: var(--luxury-black);
+  color: var(--luxury-gold);
+  border: 1px solid var(--luxury-gold);
+  transition: all 0.2s ease;
+}
+
+#login-form button:hover {
+  background: var(--luxury-gold);
+  color: var(--luxury-black);
+}
+
+/* Responsive: on smaller screens, keep width 100% */
+@media (max-width: 600px) {
+  #login-form {
+    max-width: 100%;
+    padding: 0 10px;
+  }
+}
+/* Center header, form, and paragraph on the login page */
+
+.login-container {
+  max-width: 350px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.login-container h2,
+.login-container p {
+  margin-bottom: 16px;
+}
+
+/* Light mode button and nav hover matches dark mode hover */
+:root button:hover,
+:root #login-form button:hover,
+:root nav a:hover,
+:root nav button:hover {
+  background: var(--luxury-gold-hover);
+  color: var(--luxury-black);
+  border-color: var(--luxury-gold-hover);
+  box-shadow: 0 0 12px 4px rgba(255, 230, 150, 0.7); /* buttery yellow */
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.hero-logo {
+  width: 180px;
+  max-width: 180px;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* ==============================
+   TABLE SCROLL WRAPPER (MOBILE)
+============================== */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+#leadsTable {
+  min-width: 1800px; /* tweak if needed */
+}
+
+#leadsTable th,
+#leadsTable td {
+  white-space: normal;          /* allow wrapping */
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  max-width: 240px;             /* ~45–55 chars visually */
+  line-height: 1.4;
+}
+
+
+
+@media (max-width: 600px) {
+  #filter-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+#pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+@media (max-width: 600px) {
+  #leadsTable tr {
+    cursor: pointer;
+  }
+
+  #leadsTable tr:active {
+    background: rgba(212, 175, 55, 0.15);
+  }
+}
+
+#pagination button {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+@media (max-width: 600px) {
+  form > div {
+    margin-bottom: 14px;
+  }
+
+  form label {
+    font-size: 0.9rem;
+    color: var(--text-light);
+  }
+}
+
+/* ------------------------------------------
+   Design System – Variables
+------------------------------------------ */
+:root {
+  --font-family: "Inter", "SF Pro Text", Arial, sans-serif;
+
+  --bg: #f8f9fa;
+  --bg-card: #ffffff;
+  --text: #1c1c1c;
+  --text-light: #6e6e6e;
+  --border: #e6e6e6;
+
+  --luxury-gold: #d4af37;
+  --luxury-gold-hover: #f2d675;
+  --luxury-black: #0d0d0d;
+
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="dark"] {
+  --bg: #0f0f0f;
+  --bg-card: #1a1a1a;
+  --text: #f5f5f5;
+  --text-light: #9a9a9a;
+  --border: #2a2a2a;
+
+  --luxury-gold: #e8c766;
+  --luxury-gold-hover: #ffe699;
+  --luxury-black: #000;
+
+  --shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+}
+
+/* ------------------------------------------
+   Global Styles
+------------------------------------------ */
+body {
+  font-family: var(--font-family);
+  margin: 0;
+  padding: 20px;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* ------------------------------------------
+   Navigation Bar (FIXED MOBILE)
+------------------------------------------ */
+nav {
+  background: #c9c9c9;
+  padding: 12px 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+  margin-bottom: 20px;
+  flex-wrap: wrap; /* ✅ KEY FIX */
+  justify-content: center;
+}
+
+nav a,
+nav button {
+  text-decoration: none;
+  font-size: 15px;
+  padding: 9px 16px;
+  border-radius: 10px;
+
+  background: var(--luxury-black);
+  color: var(--luxury-gold);
+  border: 1px solid var(--luxury-gold);
+
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* ✅ MOBILE NAV FIX */
+@media (max-width: 600px) {
+  nav {
+    flex-direction: row;   /* ❌ no column */
+    gap: 10px;
+  }
+
+  nav a,
+  nav button {
+    width: auto;           /* ❌ remove 100% */
+    flex: 1 1 auto;
+    text-align: center;
+  }
+}
+
+/* ------------------------------------------
+   Table Styling
+------------------------------------------ */
+#leadsTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: var(--bg-card);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  font-size: 15px;
+}
+
+#leadsTable th,
+#leadsTable td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ------------------------------------------
+   FILTER FORM (FIXED MOBILE)
+------------------------------------------ */
+#filter-form {
+  display: flex;
+  gap: 15px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+/* ✅ Mobile filter fix */
+@media (max-width: 600px) {
+  #filter-form {
+    flex-direction: row;   /* ❌ not column */
+    gap: 12px;
+  }
+
+  #filter-form > div {
+    flex: 1 1 100%;        /* inputs stack */
+  }
+
+  #filter-form button {
+    flex: 1 1 auto;        /* buttons inline */
+    width: auto;
+  }
+}
+
+/* ------------------------------------------
+   Buttons
+------------------------------------------ */
+button {
+  padding: 12px 20px;
+  background: var(--luxury-black);
+  color: var(--luxury-gold);
+  border: 1px solid var(--luxury-gold);
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+button:hover {
+  background: var(--luxury-gold);
+  color: var(--luxury-black);
+}
+
+/* ------------------------------------------
+   Pagination (Thumb-friendly)
+------------------------------------------ */
+#pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+#pagination button {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* =========================
+   Lead Priority Color Swatch
+========================= */
+
+.color-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid #999;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.35);
+  vertical-align: middle;
+}
+
+/* System default (not selectable) */
+.color-swatch.white {
+  background: #ffffff;
+}
+
+/* Lead qualities */
+.color-swatch.red {
+  background: #e53935;
+}
+
+.color-swatch.yellow {
+  background: #fbc02d;
+}
+
+.color-swatch.green {
+  background: #43a047;
+}
+
+.color-swatch.black {
+  background: #000000;
+}
+
+
+/* =======================
+   LEAD DETAIL PAGE – NEUTRAL MODE
+======================= */
+
+body.lead-page {
+  background-color: #fffed8; /* calm neutral grey */
+}
+
+/* Contain the form like a document */
+body.lead-page #lead-form {
+  max-width: 760px;
+  margin: 40px auto;
+  padding: 28px 32px;
+  background: hsl(307, 76%, 94%);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+
+/* Headings feel calmer on grey */
+body.lead-page h1 {
+  max-width: 760px;
+  margin: 30px auto 10px;
+}
+
+/* Nav stays subtle */
+body.lead-page nav {
+  max-width: 760px;
+  margin: 20px auto 0;
+}

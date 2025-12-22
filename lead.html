@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lead Details</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body class="lead-page">
+  <nav><a href="leads.html">← Back to Leads</a></nav>
+
+  <h1>Lead Details</h1>
+
+  <form id="lead-form">
+
+    <!-- READ-ONLY CORE DETAILS -->
+    <div>
+      <label>Name</label>
+      <input type="text" id="name" disabled />
+    </div>
+
+    <div>
+      <label>Phone</label>
+      <input type="tel" id="phone" disabled />
+    </div>
+
+    <div>
+      <label>Email</label>
+      <input type="email" id="email" disabled />
+    </div>
+
+    <div>
+      <label>Pin Code</label>
+      <input type="text" id="pincode" disabled />
+    </div>
+
+    <!-- ADMIN ONLY -->
+    <div>
+      <label>Assigned To</label>
+      <select id="assignedToSelect" style="display:none"></select>
+      <div id="assignedToDisplay"></div>
+    </div>
+
+    <!-- EDITABLE FOR BOTH -->
+    <hr />
+
+    <!-- ✅ LEAD QUALITY (NO WHITE OPTION) -->
+    <div>
+      <label for="lead_color">Lead Stage</label>
+      <select id="lead_color">
+        <option value="">Update To</option>
+        <option value="yellow">🟡 Persuasion</option>
+        <option value="green">🟢 Proposal Stage</option>
+        <option value="red">🔴 Junk</option>
+        <option value="black">⚫ Closure</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Date of Calling & Feedback</label>
+      <input type="text" id="date_of_calling" />
+    </div>
+
+    <div>
+      <label>Follow up 1</label>
+      <input type="text" id="followup1" />
+    </div>
+
+    <div>
+      <label>Follow up 2</label>
+      <input type="text" id="followup2" />
+    </div>
+
+    <div>
+      <label>Follow up 3</label>
+      <input type="text" id="followup3" />
+    </div>
+
+    <button type="submit">Save Changes</button>
+    <button type="button" id="delete-btn" style="background:red;color:white;">Delete Lead</button>
+
+  </form>
+
+  <script type="module" src="js/lead.js"></script>
+</body>
+</html>
+

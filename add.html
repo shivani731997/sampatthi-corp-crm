@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Add New Lead</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <nav>
+    <a href="leads.html">← Back to Leads</a>
+  </nav>
+
+  <h1>Bulk Upload Leads</h1>
+  <form id="bulk-upload-form" style="display:none; margin-top: 2em;">
+    <h2>Bulk Upload Leads (CSV Only)</h2>
+    <input type="file" id="bulkFile" accept=".csv" />
+    <button type="submit">Upload CSV</button>
+    <div id="bulkUploadMessage" style="margin-top:10px;"></div>
+  </form>
+  
+  
+
+  <h2>Add New Lead</h2>
+  <form id="add-lead-form">
+    <div>
+      <label for="date_time">Date & Time</label>
+      <input type="datetime-local" id="date_time" name="date_time" required />
+    </div>
+
+    <div>
+      <label for="name">Name</label>
+      <input type="text" id="name" name="name" required />
+    </div>
+
+    <div>
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required />
+    </div>
+
+    <div>
+      <label for="phone">Phone</label>
+      <input type="tel" id="phone" name="phone" required />
+    </div>
+
+    <div>
+      <label for="pincode">Pin Code</label>
+      <input type="text" id="pincode" name="pincode" />
+    </div>
+
+    <div id="assignedToContainer">
+      <!-- This will be replaced by JS with a dropdown for admin,
+           or hidden completely for sales users -->
+    </div>
+
+    <button type="submit">Add Lead</button>
+  </form>
+
+  <p><a href="leads.html">Back to Leads Dashboard</a></p>
+
+  <script type="module" src="js/add.js"></script>
+</body>
+</html>
