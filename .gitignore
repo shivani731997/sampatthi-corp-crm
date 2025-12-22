@@ -1,0 +1,10 @@
+# macOS
+.DS_Store
+
+# Node / backend leftovers
+package.json
+package-lock.json
+node_modules/
+
+# Editor
+.vscode/
