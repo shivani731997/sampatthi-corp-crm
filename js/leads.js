@@ -9,10 +9,7 @@ import {
   query,
   orderBy,
   getDocs,
-  limit,
-  startAfter,
   where,
-  getCountFromServer,
   writeBatch,
   doc,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
@@ -23,10 +20,6 @@ import {
 const logoutBtn = document.getElementById("logout-btn");
 const tbody = document.getElementById("leadsTableBody");
 const tableHead = document.querySelector("#leadsTable thead");
-
-const prevPageBtn = document.getElementById("prevPageBtn");
-const nextPageBtn = document.getElementById("nextPageBtn");
-const pageIndicator = document.getElementById("pageIndicator");
 
 const filterForm = document.getElementById("filter-form");
 const filterStatus = document.getElementById("filterStatus");
@@ -44,16 +37,11 @@ const bulkAssignBtn = document.getElementById("bulkAssignBtn");
 /* =======================
    STATE
 ======================= */
-const PAGE_SIZE = 100; // ✅ increased page size
-
 let userEmail = null;
 let isAdmin = false;
-let totalLeads = 0;
-let totalPages = 1;
 
-let currentPage = 1;
-let lastVisibleDoc = null;
-let isLoading = false;
+let allLeads = []; // ✅ ALL leads live here
+let filteredLeads = [];
 
 let selectedLeadIds = new Set();
 
@@ -67,7 +55,7 @@ let activeFilters = {
    HELPERS
 ======================= */
 function hasText(value) {
-  return typeof value === "string" && value.replace(/\s+/g, "").length > 0;
+  return typeof value === "string" && value.trim().length > 0;
 }
 
 function getCallTrack(lead) {
@@ -137,14 +125,6 @@ async function fetchSalesUsers() {
   return snapshot.docs.map(d => d.data().email).filter(Boolean);
 }
 
-function hasActiveFilters() {
-  return !!(
-    activeFilters.callTrack ||
-    activeFilters.color ||
-    activeFilters.assignedTo
-  );
-}
-
 /* =======================
    TABLE HEADER
 ======================= */
@@ -155,7 +135,7 @@ function renderTableHeader() {
         <th><input type="checkbox" id="selectAllLeads"></th>
         <th>Priority</th>
         <th>Name</th>
-        <th>Phone Number</th>
+        <th>Phone</th>
         <th>Assigned To</th>
         <th>Date Created</th>
         <th>Date of calling & feedback</th>
@@ -169,7 +149,7 @@ function renderTableHeader() {
       <tr>
         <th>Priority</th>
         <th>Name</th>
-        <th>Phone Number</th>
+        <th>Phone</th>
         <th>City</th>
         <th>Date Created</th>
         <th>Date of calling & feedback</th>
@@ -210,72 +190,60 @@ onAuthStateChanged(auth, async (user) => {
     filterAssignedToContainer.style.display = "none";
   }
 
-  await applyFiltersAndLoad();
+  await loadAllLeads();
+  applyFilters();
 });
 
 /* =======================
-   FILTER + PAGINATION
+   DATA LOADING (NO PAGINATION)
 ======================= */
-async function applyFiltersAndLoad() {
-  currentPage = 1;
-  lastVisibleDoc = null;
-
-  activeFilters.callTrack = filterStatus.value || null;
-  activeFilters.assignedTo =
-    isAdmin && filterAssignedTo.value ? filterAssignedTo.value : null;
-  activeFilters.color = filterColor?.value || null;
-
-  totalLeads = await fetchTotalLeadsCount(activeFilters);
-  totalPages = Math.max(1, Math.ceil(totalLeads / PAGE_SIZE));
-
-  await loadPage();
-}
-
-async function fetchTotalLeadsCount(filters) {
+async function loadAllLeads() {
   let constraints = [];
 
   if (!isAdmin) {
     constraints.push(where("assigned_to", "array-contains", userEmail));
-  }
-
-  if (isAdmin && filters.assignedTo) {
-    constraints.push(where("assigned_to", "array-contains", filters.assignedTo));
-  }
-
-  const q = query(collection(db, "leads"), ...constraints);
-  const snap = await getCountFromServer(q);
-  return snap.data().count;
-}
-
-async function loadPage(direction = "current") {
-  if (isLoading) return;
-  isLoading = true;
-
-  let constraints = [];
-
-  if (!isAdmin) {
-    constraints.push(where("assigned_to", "array-contains", userEmail));
-  }
-
-  if (isAdmin && activeFilters.assignedTo) {
-    constraints.push(where("assigned_to", "array-contains", activeFilters.assignedTo));
   }
 
   constraints.push(orderBy("date_time", "desc"));
-  constraints.push(limit(PAGE_SIZE));
-
-  if (direction === "next" && lastVisibleDoc) {
-    constraints.push(startAfter(lastVisibleDoc));
-  }
 
   const q = query(collection(db, "leads"), ...constraints);
   const snapshot = await getDocs(q);
 
-  lastVisibleDoc = snapshot.docs[snapshot.docs.length - 1] || null;
-  renderLeads(snapshot);
-  renderPagination();
+  allLeads = snapshot.docs.map(docSnap => ({
+    id: docSnap.id,
+    ...docSnap.data()
+  }));
+}
 
-  isLoading = false;
+/* =======================
+   FILTERING
+======================= */
+function applyFilters() {
+  activeFilters.callTrack = filterStatus.value || null;
+  activeFilters.assignedTo =
+    isAdmin && filterAssignedTo.value ? filterAssignedTo.value : null;
+  activeFilters.color = filterColor.value || null;
+
+  filteredLeads = allLeads.filter(lead => {
+    if (activeFilters.callTrack) {
+      if (getCallTrack(lead) !== activeFilters.callTrack) return false;
+    }
+
+    if (activeFilters.color) {
+      if ((lead.lead_color || "white") !== activeFilters.color) return false;
+    }
+
+    if (activeFilters.assignedTo) {
+      if (!Array.isArray(lead.assigned_to) ||
+          !lead.assigned_to.includes(activeFilters.assignedTo)) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+
+  renderLeads(filteredLeads);
 }
 
 /* =======================
@@ -288,24 +256,30 @@ function renderColorSwatch(color = "white") {
 /* =======================
    ROW RENDERING
 ======================= */
-function renderLeads(snapshot) {
+function renderLeads(leads) {
   tbody.innerHTML = "";
 
-  snapshot.forEach((docSnap) => {
-    const lead = docSnap.data();
+  if (!leads.length) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="10" style="text-align:center; padding:20px;">
+          No leads found.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  leads.forEach(lead => {
     const pin = extractPincode(lead.pincode);
     const color = lead.lead_color || "white";
-
-    const callTrack = getCallTrack(lead);
-    if (activeFilters.callTrack && callTrack !== activeFilters.callTrack) return;
-    if (activeFilters.color && color !== activeFilters.color) return;
 
     if (isAdmin) {
       tbody.innerHTML += `
         <tr>
-          <td><input type="checkbox" class="lead-checkbox" data-id="${docSnap.id}"></td>
-          <td onclick="window.location.href='lead.html?id=${docSnap.id}'">${renderColorSwatch(color)}</td>
-          <td onclick="window.location.href='lead.html?id=${docSnap.id}'">${lead.name || ""}</td>
+          <td><input type="checkbox" class="lead-checkbox" data-id="${lead.id}"></td>
+          <td onclick="window.location.href='lead.html?id=${lead.id}'">${renderColorSwatch(color)}</td>
+          <td onclick="window.location.href='lead.html?id=${lead.id}'">${lead.name || ""}</td>
           <td><a href="tel:${lead.phone || ""}">${lead.phone || ""}</a></td>
           <td>${Array.isArray(lead.assigned_to) ? lead.assigned_to.join(", ") : ""}</td>
           <td>${formatDateCreated(lead.date_time)}</td>
@@ -319,7 +293,7 @@ function renderLeads(snapshot) {
     }
 
     const row = document.createElement("tr");
-    row.onclick = () => window.location.href = `lead.html?id=${docSnap.id}`;
+    row.onclick = () => window.location.href = `lead.html?id=${lead.id}`;
     row.innerHTML = `
       <td>${renderColorSwatch(color)}</td>
       <td>${lead.name || ""}</td>
@@ -340,48 +314,58 @@ function renderLeads(snapshot) {
 }
 
 /* =======================
-   PAGINATION UI
+   BULK SELECT / ASSIGN
 ======================= */
-function renderPagination() {
-  // If filters are active, pagination is meaningless
-  if (hasActiveFilters()) {
-    pageIndicator.textContent = "Filtered results";
-    prevPageBtn.disabled = true;
-    nextPageBtn.disabled = true;
-    return;
-  }
+tbody.addEventListener("change", (e) => {
+  if (!e.target.classList.contains("lead-checkbox")) return;
+  const id = e.target.dataset.id;
+  e.target.checked ? selectedLeadIds.add(id) : selectedLeadIds.delete(id);
+  bulkAssignBar.style.display = selectedLeadIds.size ? "block" : "none";
+});
 
-  pageIndicator.textContent = `Page ${currentPage} of ${totalPages}`;
-  prevPageBtn.disabled = currentPage === 1 || isLoading;
-  nextPageBtn.disabled = currentPage === totalPages || isLoading;
-}
+tableHead.addEventListener("change", (e) => {
+  if (e.target.id !== "selectAllLeads") return;
+  document.querySelectorAll(".lead-checkbox").forEach(cb => {
+    cb.checked = e.target.checked;
+    e.target.checked
+      ? selectedLeadIds.add(cb.dataset.id)
+      : selectedLeadIds.delete(cb.dataset.id);
+  });
+  bulkAssignBar.style.display = selectedLeadIds.size ? "block" : "none";
+});
+
+bulkAssignBtn?.addEventListener("click", async () => {
+  const user = bulkAssignUser.value;
+  if (!user || !selectedLeadIds.size) return;
+
+  if (!confirm(`Assign ${selectedLeadIds.size} leads to ${user}?`)) return;
+
+  const batch = writeBatch(db);
+  selectedLeadIds.forEach(id => {
+    batch.update(doc(db, "leads", id), {
+      assigned_to: [user],
+      updated_at: new Date()
+    });
+  });
+
+  await batch.commit();
+  await loadAllLeads();
+  applyFilters();
+});
 
 /* =======================
    EVENTS
 ======================= */
-prevPageBtn.addEventListener("click", async () => {
-  if (currentPage === 1) return;
-  currentPage--;
-  lastVisibleDoc = null;
-  await loadPage();
-});
-
-nextPageBtn.addEventListener("click", async () => {
-  if (currentPage === totalPages) return;
-  currentPage++;
-  await loadPage("next");
-});
-
 filterForm.addEventListener("submit", e => {
   e.preventDefault();
-  applyFiltersAndLoad();
+  applyFilters();
 });
 
 clearFilterBtn.addEventListener("click", () => {
   filterStatus.value = "";
   if (isAdmin) filterAssignedTo.value = "";
   filterColor.value = "";
-  applyFiltersAndLoad();
+  applyFilters();
 });
 
 logoutBtn.addEventListener("click", () => {
