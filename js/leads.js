@@ -40,7 +40,7 @@ const bulkAssignBtn = document.getElementById("bulkAssignBtn");
 let userEmail = null;
 let isAdmin = false;
 
-let allLeads = []; // ✅ ALL leads live here
+let allLeads = [];
 let filteredLeads = [];
 
 let selectedLeadIds = new Set();
@@ -77,6 +77,21 @@ function formatDateCreated(value) {
     }
   } catch {}
   return value;
+}
+
+/* ✅ PURCHASE AMOUNT FORMATTER */
+function formatPurchaseAmount(value) {
+  switch (value) {
+    case "1_full": return "1 Full Unit";
+    case "2_full": return "2 Full Units";
+    case "3_full": return "3 Full Units";
+    case "4_full": return "4 Full Units";
+    case "frac_1_5": return "Fractional Ownership 1/5";
+    case "frac_2_5": return "Fractional Ownership 2/5";
+    case "frac_3_5": return "Fractional Ownership 3/5";
+    case "frac_4_5": return "Fractional Ownership 4/5";
+    default: return "–";
+  }
 }
 
 /* =======================
@@ -136,6 +151,7 @@ function renderTableHeader() {
         <th>Priority</th>
         <th>Name</th>
         <th>Phone</th>
+        <th>PURCHASE AMOUNT</th>
         <th>Assigned To</th>
         <th>Date Created</th>
         <th>Date of calling & feedback</th>
@@ -150,6 +166,7 @@ function renderTableHeader() {
         <th>Priority</th>
         <th>Name</th>
         <th>Phone</th>
+        <th>PURCHASE AMOUNT</th>
         <th>City</th>
         <th>Date Created</th>
         <th>Date of calling & feedback</th>
@@ -262,7 +279,7 @@ function renderLeads(leads) {
   if (!leads.length) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="10" style="text-align:center; padding:20px;">
+        <td colspan="11" style="text-align:center; padding:20px;">
           No leads found.
         </td>
       </tr>
@@ -273,6 +290,7 @@ function renderLeads(leads) {
   leads.forEach(lead => {
     const pin = extractPincode(lead.pincode);
     const color = lead.lead_color || "white";
+    const purchaseAmount = formatPurchaseAmount(lead.purchase_amount);
 
     if (isAdmin) {
       tbody.innerHTML += `
@@ -281,6 +299,7 @@ function renderLeads(leads) {
           <td onclick="window.location.href='lead.html?id=${lead.id}'">${renderColorSwatch(color)}</td>
           <td onclick="window.location.href='lead.html?id=${lead.id}'">${lead.name || ""}</td>
           <td><a href="tel:${lead.phone || ""}">${lead.phone || ""}</a></td>
+          <td>${purchaseAmount}</td>
           <td>${Array.isArray(lead.assigned_to) ? lead.assigned_to.join(", ") : ""}</td>
           <td>${formatDateCreated(lead.date_time)}</td>
           <td>${lead.date_of_calling || ""}</td>
@@ -298,6 +317,7 @@ function renderLeads(leads) {
       <td>${renderColorSwatch(color)}</td>
       <td>${lead.name || ""}</td>
       <td><a href="tel:${lead.phone || ""}">${lead.phone || ""}</a></td>
+      <td>${purchaseAmount}</td>
       <td class="city-cell">Loading…</td>
       <td>${formatDateCreated(lead.date_time)}</td>
       <td>${lead.date_of_calling || ""}</td>
@@ -371,3 +391,4 @@ clearFilterBtn.addEventListener("click", () => {
 logoutBtn.addEventListener("click", () => {
   signOut(auth).then(() => window.location.href = "index.html");
 });
+

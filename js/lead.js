@@ -22,7 +22,8 @@ const deleteBtn = document.getElementById("delete-btn");
 const assignedToSelect = document.getElementById("assignedToSelect");
 const assignedToDisplay = document.getElementById("assignedToDisplay");
 
-const leadColorSelect = document.getElementById("lead_color"); // ✅ NEW
+const leadColorSelect = document.getElementById("lead_color");
+const purchaseAmountSelect = document.getElementById("purchaseAmount"); // ✅ NEW
 
 /* =====================
    STATE
@@ -32,7 +33,7 @@ let currentUserEmail = null;
 let isAdmin = false;
 let salesUsers = [];
 let assignedToEmail = "";
-let currentLeadColor = "white"; // ✅ NEW (system default)
+let currentLeadColor = "white";
 
 /* =====================
    ROLE
@@ -98,10 +99,13 @@ async function loadLead() {
 
   // ✅ LOAD LEAD COLOR
   currentLeadColor = d.lead_color || "white";
-
-  // If not white, preselect dropdown
   if (currentLeadColor !== "white" && leadColorSelect) {
     leadColorSelect.value = currentLeadColor;
+  }
+
+  // ✅ LOAD PURCHASE AMOUNT
+  if (purchaseAmountSelect) {
+    purchaseAmountSelect.value = d.purchase_amount || "";
   }
 }
 
@@ -151,10 +155,15 @@ form.addEventListener("submit", async (e) => {
       : [];
   }
 
-  // ✅ SAVE LEAD COLOR ONLY IF USER SELECTED ONE
+  // ✅ SAVE LEAD COLOR
   const selectedColor = leadColorSelect?.value;
   if (selectedColor) {
     updateData.lead_color = selectedColor;
+  }
+
+  // ✅ SAVE PURCHASE AMOUNT
+  if (purchaseAmountSelect) {
+    updateData.purchase_amount = purchaseAmountSelect.value || "";
   }
 
   await updateDoc(doc(db, "leads", leadId), updateData);
@@ -180,3 +189,4 @@ if (!leadId) {
 if (!isAdmin) {
   deleteBtn.disabled = true;
 }
+

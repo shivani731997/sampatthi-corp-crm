@@ -49,10 +49,26 @@
       <label for="lead_color">Lead Stage</label>
       <select id="lead_color">
         <option value="">Update To</option>
-        <option value="yellow">🟡 Persuasion</option>
-        <option value="green">🟢 Proposal Stage</option>
+        <option value="yellow">🟡 In Talks with Client</option>
+        <option value="green">🟢 Sales Agreement Sent</option>
         <option value="red">🔴 Junk</option>
-        <option value="black">⚫ Closure</option>
+        <option value="black">⚫ Unit/Units Sale to Client Complete</option>
+      </select>
+    </div>
+
+    <!-- ✅ NEW: PURCHASE AMOUNT -->
+    <div>
+      <label for="purchaseAmount">PURCHASE AMOUNT</label>
+      <select id="purchaseAmount">
+        <option value="">–</option>
+        <option value="1_full">1 Full Unit</option>
+        <option value="2_full">2 Full Units</option>
+        <option value="3_full">3 Full Units</option>
+        <option value="4_full">4 Full Units</option>
+        <option value="frac_1_5">Fractional Ownership 1/5</option>
+        <option value="frac_2_5">Fractional Ownership 2/5</option>
+        <option value="frac_3_5">Fractional Ownership 3/5</option>
+        <option value="frac_4_5">Fractional Ownership 4/5</option>
       </select>
     </div>
 
@@ -84,4 +100,5 @@
   <script type="module" src="js/lead.js"></script>
 </body>
 </html>
+
 

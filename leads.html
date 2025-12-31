@@ -46,12 +46,11 @@
         <select id="filterColor" name="filterColor">
           <option value="">All</option>
           <option value="white">⚪ Fresh</option>
-          <option value="yellow">🟡 Persuasion</option>
-          <option value="green">🟢 Proposal Stage</option>
+          <option value="yellow">🟡 In Talks with Client</option>
+          <option value="green">🟢 Sales Agreement Sent</option>
           <option value="red">🔴 Junk</option>
-          <option value="black">⚫ Closure</option>
+          <option value="black">⚫ Unit/Units Sale to Client Complete</option>
         </select>
-        
       </div>
 
       <div>
@@ -76,17 +75,15 @@
   <!-- TABLE -->
   <div class="table-wrapper"></div>
     <table id="leadsTable">
-      <thead id="tableHead"></thead>
+      <thead id="tableHead">
+        <!-- Header is rendered by JS -->
+      </thead>
       <tbody id="leadsTableBody"></tbody>
     </table>
   </div>
 
-  <div id="pagination" style="margin-top:20px; display:flex; justify-content:center; align-items:center; gap:15px;">
-    <button id="prevPageBtn">← Previous</button>
-    <span id="pageIndicator">Page 1 of 1</span>
-    <button id="nextPageBtn">Next →</button>
-  </div>
-  
+  <!-- Pagination intentionally hidden -->
+  <div id="pagination" style="display:none;"></div>
 
   <script type="module" src="js/leads.js"></script>
   <script type="module">
@@ -95,4 +92,5 @@
   </script>
 </body>
 </html>
+
 
