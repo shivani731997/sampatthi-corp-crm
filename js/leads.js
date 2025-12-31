@@ -25,6 +25,10 @@ const tbody = document.getElementById("leadsTableBody");
 const paginationContainer = document.getElementById("pagination");
 const tableHead = document.querySelector("#leadsTable thead");
 
+const prevPageBtn = document.getElementById("prevPageBtn");
+const nextPageBtn = document.getElementById("nextPageBtn");
+const pageIndicator = document.getElementById("pageIndicator");
+
 const filterForm = document.getElementById("filter-form");
 const filterStatus = document.getElementById("filterStatus");
 const clearFilterBtn = document.getElementById("clearFilterBtn");
@@ -46,10 +50,11 @@ const PAGE_SIZE = 20;
 let userEmail = null;
 let isAdmin = false;
 let totalLeads = 0;
-let totalPages = 0;
+let totalPages = 1;
 
-const pageCursors = [null];
 let currentPage = 1;
+let lastVisibleDoc = null;
+let isLoading = false;
 
 let selectedLeadIds = new Set();
 
@@ -205,12 +210,9 @@ onAuthStateChanged(auth, async (user) => {
    FILTER + PAGINATION
 ======================= */
 async function applyFiltersAndLoad() {
-  selectedLeadIds.clear();
-  bulkAssignBar.style.display = "none";
-
-  pageCursors.length = 0;
-  pageCursors.push(null);
   currentPage = 1;
+  lastVisibleDoc = null;
+  isLoading = false;
 
   activeFilters.callTrack = filterStatus.value || null;
   activeFilters.assignedTo =
@@ -218,72 +220,56 @@ async function applyFiltersAndLoad() {
   activeFilters.color = filterColor?.value || null;
 
   totalLeads = await fetchTotalLeadsCount(activeFilters);
-  totalPages = Math.ceil(totalLeads / PAGE_SIZE);
+  totalPages = Math.max(1, Math.ceil(totalLeads / PAGE_SIZE));
 
-  if (totalLeads === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="9" style="text-align:center; padding:20px;">
-          No leads found.
-        </td>
-      </tr>
-    `;
-    paginationContainer.innerHTML = "";
-    return;
-  }
-
-  renderPagination();
-  await loadPage(1, activeFilters);
+  await loadPage();
 }
 
 async function fetchTotalLeadsCount(filters) {
-  try {
-    let constraints = [];
-
-    if (!isAdmin) {
-      constraints.push(where("assigned_to", "array-contains", userEmail));
-    }
-
-    if (isAdmin && filters?.assignedTo) {
-      constraints.push(where("assigned_to", "array-contains", filters.assignedTo));
-    }
-
-    const q = query(collection(db, "leads"), ...constraints);
-    const snap = await getCountFromServer(q);
-    return snap.data().count;
-  } catch {
-    return 0;
-  }
-}
-
-async function loadPage(pageNum, filters) {
-  if (pageNum < 1 || pageNum > totalPages) return;
-
-  currentPage = pageNum;
   let constraints = [];
 
   if (!isAdmin) {
     constraints.push(where("assigned_to", "array-contains", userEmail));
   }
 
-  if (isAdmin && filters?.assignedTo) {
+  if (isAdmin && filters.assignedTo) {
     constraints.push(where("assigned_to", "array-contains", filters.assignedTo));
+  }
+
+  const q = query(collection(db, "leads"), ...constraints);
+  const snap = await getCountFromServer(q);
+  return snap.data().count;
+}
+
+async function loadPage(direction = "current") {
+  if (isLoading) return;
+  isLoading = true;
+
+  let constraints = [];
+
+  if (!isAdmin) {
+    constraints.push(where("assigned_to", "array-contains", userEmail));
+  }
+
+  if (isAdmin && activeFilters.assignedTo) {
+    constraints.push(where("assigned_to", "array-contains", activeFilters.assignedTo));
   }
 
   constraints.push(orderBy("date_time", "desc"));
   constraints.push(limit(PAGE_SIZE));
 
-  let q = query(collection(db, "leads"), ...constraints);
-
-  if (pageNum > 1 && pageCursors[pageNum - 1]) {
-    q = query(q, startAfter(pageCursors[pageNum - 1]));
+  if (direction === "next" && lastVisibleDoc) {
+    constraints.push(startAfter(lastVisibleDoc));
   }
 
+  const q = query(collection(db, "leads"), ...constraints);
   const snapshot = await getDocs(q);
-  pageCursors[pageNum] = snapshot.docs[snapshot.docs.length - 1] || null;
 
+  lastVisibleDoc = snapshot.docs[snapshot.docs.length - 1] || null;
   renderLeads(snapshot);
   renderPagination();
+
+  isLoading = false;
 }
 
 /* =======================
@@ -390,33 +376,40 @@ bulkAssignBtn?.addEventListener("click", async () => {
    PAGINATION UI
 ======================= */
 function renderPagination() {
-  paginationContainer.innerHTML = "";
-  if (totalPages <= 1) return;
+  pageIndicator.textContent = `Page ${currentPage} of ${totalPages}`;
 
-  for (let i = 1; i <= totalPages; i++) {
-    const btn = document.createElement("button");
-    btn.textContent = i;
-    btn.disabled = i === currentPage;
-    btn.onclick = () => loadPage(i, activeFilters);
-    paginationContainer.appendChild(btn);
-  }
+  prevPageBtn.disabled = currentPage === 1 || isLoading;
+  nextPageBtn.disabled = currentPage === totalPages || isLoading;
 }
 
 /* =======================
    EVENTS
 ======================= */
-filterForm?.addEventListener("submit", e => {
+prevPageBtn.addEventListener("click", async () => {
+  if (currentPage === 1) return;
+  currentPage--;
+  lastVisibleDoc = null;
+  await loadPage();
+});
+
+nextPageBtn.addEventListener("click", async () => {
+  if (currentPage === totalPages) return;
+  currentPage++;
+  await loadPage("next");
+});
+
+filterForm.addEventListener("submit", e => {
   e.preventDefault();
   applyFiltersAndLoad();
 });
 
-clearFilterBtn?.addEventListener("click", () => {
+clearFilterBtn.addEventListener("click", () => {
   filterStatus.value = "";
   if (isAdmin) filterAssignedTo.value = "";
   filterColor.value = "";
   applyFiltersAndLoad();
 });
 
-logoutBtn?.addEventListener("click", () => {
+logoutBtn.addEventListener("click", () => {
   signOut(auth).then(() => window.location.href = "index.html");
 });
