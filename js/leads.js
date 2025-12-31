@@ -137,6 +137,14 @@ async function fetchSalesUsers() {
   return snapshot.docs.map(d => d.data().email).filter(Boolean);
 }
 
+function hasActiveFilters() {
+  return !!(
+    activeFilters.callTrack ||
+    activeFilters.color ||
+    activeFilters.assignedTo
+  );
+}
+
 /* =======================
    TABLE HEADER
 ======================= */
@@ -335,6 +343,14 @@ function renderLeads(snapshot) {
    PAGINATION UI
 ======================= */
 function renderPagination() {
+  // If filters are active, pagination is meaningless
+  if (hasActiveFilters()) {
+    pageIndicator.textContent = "Filtered results";
+    prevPageBtn.disabled = true;
+    nextPageBtn.disabled = true;
+    return;
+  }
+
   pageIndicator.textContent = `Page ${currentPage} of ${totalPages}`;
   prevPageBtn.disabled = currentPage === 1 || isLoading;
   nextPageBtn.disabled = currentPage === totalPages || isLoading;
