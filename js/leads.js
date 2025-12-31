@@ -22,7 +22,6 @@ import {
 ======================= */
 const logoutBtn = document.getElementById("logout-btn");
 const tbody = document.getElementById("leadsTableBody");
-const paginationContainer = document.getElementById("pagination");
 const tableHead = document.querySelector("#leadsTable thead");
 
 const prevPageBtn = document.getElementById("prevPageBtn");
@@ -45,7 +44,7 @@ const bulkAssignBtn = document.getElementById("bulkAssignBtn");
 /* =======================
    STATE
 ======================= */
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 100; // ✅ increased page size
 
 let userEmail = null;
 let isAdmin = false;
@@ -212,7 +211,6 @@ onAuthStateChanged(auth, async (user) => {
 async function applyFiltersAndLoad() {
   currentPage = 1;
   lastVisibleDoc = null;
-  isLoading = false;
 
   activeFilters.callTrack = filterStatus.value || null;
   activeFilters.assignedTo =
@@ -334,50 +332,10 @@ function renderLeads(snapshot) {
 }
 
 /* =======================
-   BULK SELECT / ASSIGN
-======================= */
-tbody.addEventListener("change", (e) => {
-  if (!e.target.classList.contains("lead-checkbox")) return;
-  const id = e.target.dataset.id;
-  e.target.checked ? selectedLeadIds.add(id) : selectedLeadIds.delete(id);
-  bulkAssignBar.style.display = selectedLeadIds.size ? "block" : "none";
-});
-
-tableHead.addEventListener("change", (e) => {
-  if (e.target.id !== "selectAllLeads") return;
-  document.querySelectorAll(".lead-checkbox").forEach(cb => {
-    cb.checked = e.target.checked;
-    e.target.checked
-      ? selectedLeadIds.add(cb.dataset.id)
-      : selectedLeadIds.delete(cb.dataset.id);
-  });
-  bulkAssignBar.style.display = selectedLeadIds.size ? "block" : "none";
-});
-
-bulkAssignBtn?.addEventListener("click", async () => {
-  const user = bulkAssignUser.value;
-  if (!user || !selectedLeadIds.size) return;
-
-  if (!confirm(`Assign ${selectedLeadIds.size} leads to ${user}?`)) return;
-
-  const batch = writeBatch(db);
-  selectedLeadIds.forEach(id => {
-    batch.update(doc(db, "leads", id), {
-      assigned_to: [user],
-      updated_at: new Date()
-    });
-  });
-
-  await batch.commit();
-  await applyFiltersAndLoad();
-});
-
-/* =======================
    PAGINATION UI
 ======================= */
 function renderPagination() {
   pageIndicator.textContent = `Page ${currentPage} of ${totalPages}`;
-
   prevPageBtn.disabled = currentPage === 1 || isLoading;
   nextPageBtn.disabled = currentPage === totalPages || isLoading;
 }
