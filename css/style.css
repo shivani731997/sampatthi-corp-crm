@@ -667,3 +667,27 @@ body.lead-page nav {
   max-width: 760px;
   margin: 20px auto 0;
 }
+
+.checkbox-cell {
+  width: 48px;
+  text-align: center;
+}
+
+.checkbox-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+
+.checkbox-wrapper input {
+  cursor: pointer;
+}
+
+.checkbox-hitbox {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+}

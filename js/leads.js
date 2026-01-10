@@ -293,21 +293,34 @@ function renderLeads(leads) {
     const purchaseAmount = formatPurchaseAmount(lead.purchase_amount);
 
     if (isAdmin) {
-      tbody.innerHTML += `
-        <tr>
-          <td><input type="checkbox" class="lead-checkbox" data-id="${lead.id}"></td>
-          <td onclick="window.location.href='lead.html?id=${lead.id}'">${renderColorSwatch(color)}</td>
-          <td onclick="window.location.href='lead.html?id=${lead.id}'">${lead.name || ""}</td>
-          <td><a href="tel:${lead.phone || ""}">${lead.phone || ""}</a></td>
-          <td>${purchaseAmount}</td>
-          <td>${Array.isArray(lead.assigned_to) ? lead.assigned_to.join(", ") : ""}</td>
-          <td>${formatDateCreated(lead.date_time)}</td>
-          <td>${lead.date_of_calling || ""}</td>
-          <td>${lead.followup1 || ""}</td>
-          <td>${lead.followup2 || ""}</td>
-          <td>${lead.followup3 || ""}</td>
-        </tr>
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td class="checkbox-cell">
+          <label class="checkbox-wrapper">
+            <input type="checkbox" class="lead-checkbox" data-id="${lead.id}">
+            <span class="checkbox-hitbox"></span>
+          </label>
+        </td>
+        <td>${renderColorSwatch(color)}</td>
+        <td>${lead.name || ""}</td>
+        <td><a href="tel:${lead.phone || ""}">${lead.phone || ""}</a></td>
+        <td>${purchaseAmount}</td>
+        <td>${Array.isArray(lead.assigned_to) ? lead.assigned_to.join(", ") : ""}</td>
+        <td>${formatDateCreated(lead.date_time)}</td>
+        <td>${lead.date_of_calling || ""}</td>
+        <td>${lead.followup1 || ""}</td>
+        <td>${lead.followup2 || ""}</td>
+        <td>${lead.followup3 || ""}</td>
       `;
+      
+      tr.addEventListener("click", (e) => {
+        if (e.target.closest(".checkbox-wrapper")) return;
+        window.location.href = `lead.html?id=${lead.id}`;
+      });
+      
+      tbody.appendChild(tr);
+      
       return;
     }
 
@@ -342,6 +355,14 @@ tbody.addEventListener("change", (e) => {
   e.target.checked ? selectedLeadIds.add(id) : selectedLeadIds.delete(id);
   bulkAssignBar.style.display = selectedLeadIds.size ? "block" : "none";
 });
+
+// Prevent row navigation when clicking checkbox area
+tbody.addEventListener("click", (e) => {
+  if (e.target.closest(".checkbox-wrapper")) {
+    e.stopPropagation();
+  }
+});
+
 
 tableHead.addEventListener("change", (e) => {
   if (e.target.id !== "selectAllLeads") return;
